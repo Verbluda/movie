@@ -23,6 +23,8 @@ public class Review {
     @ManyToOne
     private Movie movie;
 
+    private int rating;
+
     private LocalDateTime date;
 }
 

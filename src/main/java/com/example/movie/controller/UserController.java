@@ -1,34 +1,24 @@
 package com.example.movie.controller;
 
-import com.example.movie.entity.Review;
-import com.example.movie.entity.User;
-import com.example.movie.UserContext;
-import com.example.movie.service.impl.ReviewService;
-import com.example.movie.service.impl.UserService;
-import org.mindrot.jbcrypt.BCrypt;
+import com.example.movie.service.ReviewService;
+import com.example.movie.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final ReviewService reviewService;
 
-    public UserController(UserService userService, ReviewService reviewService) {
-        this.userService = userService;
-        this.reviewService = reviewService;
-    }
-
     @GetMapping("/login")
     public String index(HttpServletRequest request) {
-        String redirectUrl = request.getHeader("Referer");
-        request.getSession().setAttribute("redirectUrl", redirectUrl);
+        userService.index(request);
         return "login";
     }
 
@@ -36,33 +26,12 @@ public class UserController {
     public String login(@RequestParam String username,
                         @RequestParam String password,
                         HttpServletRequest request) {
-
-        Optional<User> user = userService.findUserByUsername(username);
-
-        if (user.isPresent()) {
-            if (BCrypt.checkpw(password, user.get().getPassword())) {
-                UserContext.getInstance().setCurrentUser(user.get());
-
-                String redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
-                if (redirectUrl != null) {
-                    return "redirect:" + redirectUrl;
-                }
-            }
-        }
-        return "redirect:/";
+        return userService.login(username, password, request);
     }
 
     @GetMapping("/register")
     public String showRegistrationForm(HttpServletRequest request, Model model) {
-        String redirectUrl = request.getHeader("Referer");
-        request.getSession().setAttribute("redirectUrl", redirectUrl);
-
-        if (!model.containsAttribute("username")) {
-            model.addAttribute("username", "");
-        }
-        if (!model.containsAttribute("email")) {
-            model.addAttribute("email", "");
-        }
+        userService.showRegistrationForm(request, model);
         return "register";
     }
 
@@ -74,65 +43,28 @@ public class UserController {
                                @RequestParam String lastName,
                                HttpServletRequest request,
                                Model model) {
-
-        String redirectUrl = request.getHeader("Referer");
-        request.getSession().setAttribute("redirectUrl", redirectUrl);
-
-        Optional<User> userByEmail = userService.findByEmail(email);
-        Optional<User> userByUsername = userService.findByUsername(username);
-
-        if (userByUsername.isPresent()) {
-            model.addAttribute("username", "Имя уже занято");
-            return "redirect:" + redirectUrl;
-        }
-
-        if (userByEmail.isPresent()) {
-            model.addAttribute("email", "Email уже используется");
-            return "redirect:" + redirectUrl;
-        }
-
-        userService.saveUser(new User(username, password, email, firstName, lastName));
-
-        Optional<User> newUser = userService.findUserByUsername(username);
-
-        if (newUser.isPresent()) {
-            UserContext.getInstance().setCurrentUser(newUser.get());
-        }
-
-        if (redirectUrl != null) {
-            return "redirect:" + redirectUrl;
-        }
-
-        return "redirect:/";
+        return userService.registerUser(username, password, email, firstName, lastName, request, model);
     }
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
-        String redirectUrl = request.getHeader("Referer");
-        UserContext.getInstance().clearCurrentUser();
-
-        if (redirectUrl != null && redirectUrl.contains("/profile")) {
-            return "redirect:/";
-        }
-
-        if (redirectUrl != null) {
-            return "redirect:" + redirectUrl;
-        }
-
-        return "redirect:/";
+        return userService.logout(request);
     }
 
     @GetMapping("/profile/{id}")
     public String getUserProfile(@PathVariable("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
+        userService.getUserProfile(id, model);
         return "profile";
+    }
+
+    @GetMapping("/author")
+    public String getAuthorProfile() {
+        return "author";
     }
 
     @GetMapping("/edit_profile")
     public String editProfile(@PathVariable("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
+        userService.editProfile(id, model);
         return "redirect:/profile/" + id;
     }
 
@@ -145,52 +77,18 @@ public class UserController {
                                 @RequestParam("password") String password,
                                 @RequestParam("confirmPassword") String confirmPassword,
                                 Model model) {
-
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Пароли не совпадают");
-            model.addAttribute("user", userService.getUserById(id)); // добавляем пользователя в модель
-            return "redirect:/profile/" + id;
-        }
-
-        User user = userService.getUserById(id);
-        if (user != null) {
-            user.setUsername(username);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setEmail(email);
-
-            if (!password.isEmpty()) {
-                user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-            }
-
-            userService.saveUser(user);
-        }
-
-        return "redirect:/profile/" + id;
+        return userService.updateProfile(id, username, firstName, lastName, email, password, confirmPassword, model);
     }
 
     @GetMapping("/reviews")
     public String showReviewsPage(Model model) {
-        model.addAttribute("reviews", reviewService.getAllReviews());
-        User user = UserContext.getInstance().getCurrentUser();
-        if (user != null) {
-            model.addAttribute("user", user);
-        }
+        reviewService.showReviewsPage(model);
         return "reviews"; // reviews.html
     }
 
     @PostMapping("/addReview")
-    public String addReview(@RequestParam String text) {
-        User currentUser = UserContext.getInstance().getCurrentUser();
-
-        if (currentUser != null) {
-            Review review = new Review();
-            review.setUser(currentUser);
-            review.setText(text);
-            review.setDate(LocalDateTime.now()); // Устанавливаем текущую дату и время
-            reviewService.saveReview(review);
-        }
+    public String addReview(@RequestParam Long movieId, @RequestParam int rating, @RequestParam String text, Model model) {
+        reviewService.addReview(movieId, rating, text, model);
         return "redirect:/reviews";
     }
-
 }

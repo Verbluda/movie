@@ -60,7 +60,7 @@
         }
 
         .table th {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             color: #fff;
         }
 
@@ -69,12 +69,12 @@
         }
 
         .btn-primary {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #a02030;
+            background-color: #c75d2c;
         }
 
         .btn-primary:active {
@@ -133,7 +133,7 @@
         }
 
         .nav-link:hover {
-            color: #c72c41; /* Цвет при наведении */
+            color: #c44308; /* Цвет при наведении */
         }
 
         /* Верхний навигационный бар */
@@ -157,7 +157,7 @@
 
         /* Кнопки входа и регистрации */
         .btn-primary {
-            background-color: #c72c41; /* Красный цвет фона */
+            background-color: #c75d2c; /* Красный цвет фона */
             border: none;
             padding: 8px 20px;
             font-size: 16px;
@@ -166,7 +166,7 @@
         }
 
         .btn-primary:hover {
-            background-color: #a02030; /* Темно-красный при наведении */
+            background-color: #c75d2c; /* Темно-красный при наведении */
         }
 
         .btn-primary:active {
@@ -183,7 +183,7 @@
 
         /* Стили для кнопки выхода */
         .btn-danger {
-            background-color: #c72c41; /* Красный для кнопки выхода */
+            background-color: #c75d2c; /* Красный для кнопки выхода */
             border: none;
             padding: 5px 15px;
             font-size: 14px;
@@ -191,14 +191,14 @@
         }
 
         .btn-danger:hover {
-            background-color: #a02030; /* Темный красный при наведении */
+            background-color: #c44308; /* Темный красный при наведении */
         }
         .nav-link.active {
-            color:  #a02030; !important;
+            color: #c44308; !important;
             font-weight: bold;
         }
         .modal-header {
-            background-color: #c72c41; /* Matching the button color */
+            background-color: #c75d2c; /* Matching the button color */
             color: white;
             display: flex;
             justify-content: center; /* Centers the content horizontally */
@@ -357,6 +357,7 @@
             <a class="nav-link" href="/">Главная страница</a>
             <a class="nav-link" href="/movies">Список всех фильмов</a>
             <a class="nav-link" href="/reviews">Отзывы</a>
+            <a class="nav-link" href="/author">Об авторе</a>
         </nav>
 
         <!-- Верхний навигационный бар -->
@@ -427,6 +428,35 @@
         </div>
     </div>
 </main>
+
+<div class="card p-4" style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); background: #f9f9f9;">
+    <h4 class="section-title" style="font-family: 'Times New Roman', serif; font-size: 2.2em; color: #333; text-align: center; margin-bottom: 30px; font-weight: bold; text-transform: none;">
+        Избранное
+    </h4>
+
+    <!-- Таблица с фильмами -->
+    <div class="table-responsive">
+        <table class="table table-hover" style="border-collapse: separate; border-spacing: 0 10px; width: 100%; font-size: 15px; text-align: left;">
+            <thead>
+            <tr style="background-color: #2d3e50; color: #fff;">
+                <th style="padding: 15px 20px; font-weight: bold; border-top-left-radius: 10px; border-bottom: 2px solid #fff;">Название фильма</th>
+                <th style="padding: 15px 20px; font-weight: bold; border-bottom: 2px solid #fff;">Описание фильма</th>
+                <th style="padding: 15px 20px; font-weight: bold; border-bottom: 2px solid #fff;">Режиссер</th>
+                <th style="padding: 15px 20px; font-weight: bold; border-bottom: 2px solid #fff;">Жанр</th>
+            </tr>
+            </thead>
+            <tbody id="movieTable" style="background-color: #fff; border-radius: 15px;">
+            <tr th:each="movie : ${listFavoriteMovies}" style="border-radius: 10px; background-color: #f3f5f7; transition: background-color 0.3s ease;"
+                th:onclick="'location.href=\'/movies/' + ${movie.id} + '\''">
+                <td th:text="${movie.movieName}" style="padding: 15px 20px; border-radius: 10px 0 0 10px;">Название фильма отсутствует</td>
+                <td th:text="${movie.movieDescription}" style="padding: 15px 20px;">Описание фильма отсутствует</td>
+                <td th:text="${movie.movieDirector}" style="padding: 15px 20px;">Режиссер отсутствует</td>
+                <td th:text="${movie.movieGenre}" style="padding: 15px 20px;">Жанр отсутствует</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <footer class="mt-5">
     <p>&copy; 2024 Платформа онлайн-кинотеатра. Все права защищены.</p>

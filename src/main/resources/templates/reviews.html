@@ -69,7 +69,7 @@
         }
 
         .table th {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             color: #fff;
         }
 
@@ -78,12 +78,12 @@
         }
 
         .btn-primary {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #a02030;
+            background-color: #c75d2c;
         }
 
         .btn-primary:active {
@@ -142,7 +142,7 @@
         }
 
         .nav-link.active {
-            color:  #a02030; !important;
+            color: #943603; !important;
             font-weight: bold;
         }
 
@@ -167,7 +167,7 @@
 
         /* Кнопки входа и регистрации */
         .btn-primary {
-            background-color: #c72c41; /* Красный цвет фона */
+            background-color: #c75d2c; /* Оранжевый цвет фона */
             border: none;
             padding: 8px 20px;
             font-size: 16px;
@@ -176,7 +176,7 @@
         }
 
         .btn-primary:hover {
-            background-color: #a02030; /* Темно-красный при наведении */
+            background-color: #c75d2c; /* Темно-оранжевый при наведении */
         }
 
         .btn-primary:active {
@@ -193,7 +193,7 @@
 
         /* Стили для кнопки выхода */
         .btn-danger {
-            background-color: #c72c41; /* Красный для кнопки выхода */
+            background-color: #c75d2c; /* Оранжевый для кнопки выхода */
             border: none;
             padding: 5px 15px;
             font-size: 14px;
@@ -201,10 +201,10 @@
         }
 
         .btn-danger:hover {
-            background-color: #a02030; /* Темный красный при наведении */
+            background-color: #c44308; /* Темный оранжевый при наведении */
         }
         .btn-custom {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             color: white;
             width: 100%;
             padding: 10px;
@@ -213,10 +213,10 @@
         }
 
         .btn-custom:hover {
-            background-color: #a02030;
+            background-color: #c75d2c;
         }
         .modal-header {
-            background-color: #c72c41; /* Matching the button color */
+            background-color: #c44308; /* Matching the button color */
             color: white;
             display: flex;
             justify-content: center; /* Centers the content horizontally */
@@ -242,7 +242,7 @@
             font-size: 3.5rem;
             font-weight: bold;
             color: #111; /* Темный оттенок для выделения заголовка */
-            border-bottom: 3px solid #a02030; /* Нижняя граница в цвет кнопки */
+            border-bottom: 3px solid #943603; /* Нижняя граница в цвет кнопки */
             display: inline-block;
             padding-bottom: 5px;
         }
@@ -328,7 +328,7 @@
 
         /* Дополнительные стили для кнопок */
         .btn-cta {
-            background-color: #c72c41;
+            background-color: #c75d2c;
             color: #fff;
             padding: 15px 30px;
             font-size: 1.2rem;
@@ -340,7 +340,7 @@
         }
 
         .btn-cta:hover {
-            background-color: #a02030;
+            background-color: #c75d2c;
             transform: scale(1.05);
             transition: transform 0.3s ease-in-out;
         }
@@ -376,6 +376,7 @@
             <a class="nav-link" href="/">Главная страница</a>
             <a class="nav-link" href="/movies">Список всех фильмов</a>
             <a class="nav-link" href="/reviews">Отзывы</a>
+            <a class="nav-link" href="/author">Об авторе</a>
         </nav>
 
         <!-- Верхний навигационный бар -->
@@ -392,6 +393,7 @@
                     </button>
                 </div>
             </div>
+
             <div th:if="${user != null}" class="user-info">
                 <!-- Ссылка на профиль пользователя с применением стиля nav-link -->
                 <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}" class="nav-link"></a>
@@ -403,6 +405,7 @@
     <h1>Онлайн-кинотеатр Фильмопоиск</h1>
     <p>Все фильмы планеты в одном окне</p>
 </header>
+
 <div class="container my-5">
     <h1 class="text-center mb-4 text-primary text-black">Отзывы</h1>
 
@@ -416,11 +419,17 @@
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTguvCLKy5tV-8Y7mKou8PDop9bZuop2szFVg&s" class="img-fluid rounded-circle" alt="User">
                         </div>
                         <div class="col-9">
-                            <div class="card-body">
+                            <div class="card-body" th:onclick="'location.href=\'/movies/' + ${review.movie.id} + '\''">
                                 <!-- Имя пользователя -->
                                 <h5 class="card-title font-weight-bold text-dark" th:text="${review.user.firstName + ' ' + review.user.lastName}">
                                     Имя пользователя
                                 </h5>
+
+                                <!-- Название фильма -->
+                                <p class="card-text text-dark mb-4" th:text="${review.movie.movieName}">Название фильма</p>
+
+                                <!-- Оценка фильма -->
+                                <p class="card-text text-dark mb-4" th:text="${review.rating}">Оценка фильма</p>
 
                                 <!-- Текст отзыва -->
                                 <p class="card-text text-dark mb-4" th:text="${review.text}">Текст отзыва</p>
@@ -441,11 +450,31 @@
 
 
     <!-- Форма для добавления нового отзыва -->
-    <div class="row">
+    <div class="row" th:if="${user != null}">
         <div class="col-md-8 offset-md-2">
             <div class="card shadow-sm p-4 rounded-lg">
                 <h5 class="card-title text-center mb-4">Оставьте ваш отзыв</h5>
                 <form method="post" th:action="@{/addReview}">
+                    <div class="mb-3">
+                        <select class="form-select form-select-lg mb-3" name="movieId">
+                            <option th:each="movie : ${listMovies}" th:value="${movie.id}" th:text="${movie.movieName}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <select class="form-select form-select-lg mb-3" name="rating">
+                            <option selected>Поставьте оценку фильму от 1 до 10</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label for="text" class="form-label">Ваш отзыв</label>
                         <textarea id="text" name="text" class="form-control" rows="4" required placeholder="Введите ваш отзыв..."></textarea>

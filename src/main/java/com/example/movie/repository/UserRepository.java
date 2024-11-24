@@ -12,5 +12,4 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     List<User> findByRole(String role); // Находит всех пользователей с определенной ролью
-
 }

@@ -4,13 +4,14 @@ CREATE TABLE IF NOT EXISTS movie (
     movie_description VARCHAR(255),
     movie_director VARCHAR(255),
     movie_genre VARCHAR(255),
+    video_link VARCHAR(255),
     PRIMARY KEY (id)
 );
 
-INSERT INTO movie VALUES (1, 'Леон', 'Осиротевшая девочка становится напарницей наемного убийцы. Культовый триллер с Жаном Рено и Натали Портман', 'Люк Бессон', 'боевик'),
-                         (2, 'Дэдпул', 'Уэйд Уилсон — наёмник. Будучи побочным продуктом программы вооружённых сил под названием ...', 'Тим Миллер', 'комедия'),
-                         (3, '1+1', 'Аристократ на коляске нанимает в сиделки бывшего заключенного. Искрометная французская комедия с Омаром Си', 'Оливье Накаш', 'драма'),
-                         (4, 'Джон Уик 4', 'Чтобы обрести свободу, киллер-изгой бросает вызов Правлению кланов.', 'Чад Стахелски', 'боевик');
+INSERT INTO movie VALUES (1, 'Леон', 'Осиротевшая девочка становится напарницей наемного убийцы. Культовый триллер с Жаном Рено и Натали Портман', 'Люк Бессон', 'боевик', 'https://rutube.ru/video/b9a0e1e3264f557d5cd6544e92adefea/'),
+                         (2, 'Дэдпул', 'Уэйд Уилсон — наёмник. Будучи побочным продуктом программы вооружённых сил под названием ...', 'Тим Миллер', 'комедия', 'https://rutube.ru/video/062407889e3870e83ecc800cf78fdea2/'),
+                         (3, '1+1', 'Аристократ на коляске нанимает в сиделки бывшего заключенного. Искрометная французская комедия с Омаром Си', 'Оливье Накаш', 'драма', 'https://rutube.ru/video/50d09cd2daa46a98172b8b7bb6846271/'),
+                         (4, 'Джон Уик 4', 'Чтобы обрести свободу, киллер-изгой бросает вызов Правлению кланов.', 'Чад Стахелски', 'боевик', 'https://rutube.ru/video/512cdad0fba7c3e72da03e765f996deb/');
 
 CREATE TABLE IF NOT EXISTS user (
                                      id bigint NOT NULL AUTO_INCREMENT,
@@ -35,13 +36,27 @@ CREATE TABLE IF NOT EXISTS review (
                                     text VARCHAR(255),
                                     user_id bigint,
                                     movie_id bigint,
+                                    rating int,
                                     PRIMARY KEY (id),
                                     FOREIGN KEY (user_id) REFERENCES user(id),
-                                    FOREIGN KEY (movie_id) REFERENCES movie(id)
+                                    FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE CASCADE
 );
 
-INSERT INTO review VALUES (1, '2024-11-14 19:39:17', 'Отличный фильм', 1, 1),
-                        (2, '2024-11-15 20:39:17', 'Ужасный фильм', 2, 1),
-                        (3, '2024-11-16 21:39:17', 'Скучный фильм', 3, 1),
-                        (4, '2024-11-17 22:39:17', 'Понравилось', 4, 2);
+INSERT INTO review VALUES (1, '2024-11-14 19:39:17', 'Отличный фильм', 1, 1, 9),
+                        (2, '2024-11-15 20:39:17', 'Ужасный фильм', 2, 1, 2),
+                        (3, '2024-11-16 21:39:17', 'Скучный фильм', 3, 1, 5),
+                        (4, '2024-11-17 22:39:17', 'Понравилось', 4, 2, 10);
+
+CREATE TABLE IF NOT EXISTS favorite (
+                                        id bigint NOT NULL AUTO_INCREMENT,
+                                        user_id bigint,
+                                        movie_id bigint,
+                                        PRIMARY KEY (id),
+                                        FOREIGN KEY (user_id) REFERENCES user(id),
+                                        FOREIGN KEY (movie_id) REFERENCES movie(id)
+);
+
+INSERT INTO favorite VALUES (1, 1, 1),
+                            (2, 1, 2),
+                            (3, 1, 3);
 

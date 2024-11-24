@@ -1,11 +1,14 @@
 package com.example.movie.service.impl;
 
 import com.example.movie.UserContext;
+import com.example.movie.entity.FavoriteMovie;
 import com.example.movie.entity.Movie;
 import com.example.movie.entity.Review;
 import com.example.movie.entity.User;
+import com.example.movie.repository.FavoriteMovieRepository;
 import com.example.movie.repository.MovieRepository;
 import com.example.movie.repository.ReviewRepository;
+import com.example.movie.repository.UserRepository;
 import com.example.movie.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
     private final ReviewRepository reviewRepository;
+    private final FavoriteMovieRepository favoriteMovieRepository;
 
     @Override
     public void getHomePage(Model model, String keyword) {
@@ -50,6 +54,17 @@ public class MovieServiceImpl implements MovieService {
         boolean noMoviesFound = listMovies.isEmpty();
         model.addAttribute("noMoviesFound", noMoviesFound);
 
+        // Получаем текущего пользователя из UserContext и добавляем его в модель
+        User user = UserContext.getInstance().getCurrentUser();
+        if (user != null) {
+            model.addAttribute("user", user);
+            List<Movie> listFavoriteMovie = movieRepository.findFavoriteMovieByUser(user.getId());
+            model.addAttribute("listFavoriteMovie", listFavoriteMovie);
+        }
+    }
+
+    @Override
+    public void getAuthorInfo(Model model) {
         // Получаем текущего пользователя из UserContext и добавляем его в модель
         User user = UserContext.getInstance().getCurrentUser();
         if (user != null) {
@@ -98,7 +113,14 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void deleteCourse(Long id) {
+    public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
+    }
+
+    @Override
+    public void makeMovieFavorite(Long id) {
+        User user = UserContext.getInstance().getCurrentUser();
+        FavoriteMovie favoriteMovie = new FavoriteMovie(id, user.getId());
+        favoriteMovieRepository.save(favoriteMovie);
     }
 }

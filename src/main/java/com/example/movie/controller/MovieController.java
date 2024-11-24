@@ -21,6 +21,12 @@ public class MovieController {
         return "index";
     }
 
+    @RequestMapping("/author")
+    public String getHomePage(Model model) {
+        movieService.getAuthorInfo(model);
+        return "author";
+    }
+
     @RequestMapping("/movies")
     public String getMovies(Model model, @Param("keyword") String keyword) {
         movieService.getMovies(model, keyword);
@@ -51,8 +57,14 @@ public class MovieController {
     }
 
     @RequestMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable(name = "id") Long id) {
-        movieService.deleteCourse(id);
+    public String deleteMovie(@PathVariable(name = "id") Long id) {
+        movieService.deleteMovie(id);
+        return "redirect:/movies";
+    }
+
+    @RequestMapping("/favorite/{id}")
+    public String makeMovieFavorite(@PathVariable(name = "id") Long id) {
+        movieService.makeMovieFavorite(id);
         return "redirect:/movies";
     }
 }
